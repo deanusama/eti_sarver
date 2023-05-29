@@ -14,7 +14,7 @@ const app = express()
 app.use(express.json())
 
 app.use(cors({
-    origin: "https://et-oman.netlify.app"
+    origin: "https://eti-oman.netlify.app"
 }))
 
 app.use("/uploads", express.static('uploads'))
