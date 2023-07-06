@@ -1,0 +1,1 @@
+export const pathURL = 'https://eti-oman.netlify.app'
