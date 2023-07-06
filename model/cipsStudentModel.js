@@ -9,7 +9,7 @@ const cipsStudentSchema = new Schema({
     email: String,
     password: String,
     dateOfJoin: String,
-    expairyDate: String,
+    expiryDate: String,
     courseTitle: String,
     idNo: String,
     gender: String,
@@ -23,11 +23,15 @@ const cipsStudentSchema = new Schema({
         type: Boolean,
         default: false
     },
+    cipsDocs: [{
+        name: String
+    }],
 
     examDetail: [{
         module: String,
-        moduleExamDateFrom: String,
-        moduleExamDateTo: String,
+        AttendenceDateFrom: String,
+        AttendenceDateTo: String,
+        examDate: String,
         result: String,
         remarks: String,
 

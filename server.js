@@ -8,13 +8,14 @@ import studentRouter from './routes/studentRoutes.js'
 
 import cipsStudentRouter from './routes/cipsStudentRoutes.js'
 import cors from 'cors'
+import { pathURL } from "./utils.js";
 
 
 const app = express()
 app.use(express.json())
 
 app.use(cors({
-    origin: "https://eti-oman.netlify.app"
+    origin: pathURL
 }))
 
 app.use("/uploads", express.static('uploads'))

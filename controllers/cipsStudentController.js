@@ -5,20 +5,26 @@ import CipsStudent from "../model/cipsStudentModel.js";
 
 export const addCipsStudent = async (req, res) => {
 
+    const { files, body: { examDetail: examDetailRaw, ...rest } } = req
+    const cipsDocs = files.map((file) => ({ name: file.path }))
+
+    const examDetail = JSON.parse(examDetailRaw)
 
     try {
 
         const cipsStudent = await CipsStudent.create({
-            ...req.body,
+            ...rest, cipsDocs, examDetail
         });
-        res.status(StatusCodes.CREATED).json({cipsStudent})
 
+        res.status(StatusCodes.CREATED).json({ cipsStudent })
 
     } catch (error) {
         res.status(StatusCodes.BAD_REQUEST).json({ msg: error.message })
 
     }
 }
+
+
 
 export const allCipsStudent = async (req, res) => {
 
@@ -80,7 +86,10 @@ export const getUpdateCipsStudent = async (req, res) => {
 export const editCipsStudent = async (req, res) => {
 
     const id = req.params.id
+    const { files, body: { examDetail: examDetailRaw, ...rest } } = req
+    const cipsDocs = files.map((file) => ({ name: file.path }))
 
+    const examDetail = JSON.parse(examDetailRaw)
 
     try {
 
@@ -93,14 +102,37 @@ export const editCipsStudent = async (req, res) => {
             throw new Error(`No Cips Student with with ID ${id}`)
         }
 
-        const updatedCipsStudent = await CipsStudent.findOneAndUpdate(
-            { _id: id },
+        let updatedCipsStudent;
 
-            req.body,
-   
-            { new: true, runValidators: true })
-            res.status(StatusCodes.OK).json({ updatedCipsStudent })
+        if (files.length === 0) {
 
+            const { cipsDocs } = await CipsStudent.findById(id)
+            const files = cipsDocs.map((item) => ({ name: item.name }))
+
+            updatedCipsStudent = await CipsStudent.findOneAndUpdate(
+                { _id: id },
+                {
+                    ...rest, examDetail, cipsDocs: files
+                },
+
+                { new: true, runValidators: true }
+
+            )
+
+        } else {
+
+            updatedCipsStudent = await CipsStudent.findOneAndUpdate(
+                { _id: id },
+
+                {
+                    ...rest, examDetail, cipsDocs
+                },
+
+                { new: true, runValidators: true })
+
+        }
+
+        res.status(StatusCodes.OK).json({ updatedCipsStudent })
     } catch (error) {
         res.status(StatusCodes.BAD_REQUEST).json({ msg: error.message })
 

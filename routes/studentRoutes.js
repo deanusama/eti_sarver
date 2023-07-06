@@ -3,10 +3,6 @@ import { addStudent, allStudent, allStudentInvoices, editStudent, editStudentInv
 
 const router = express.Router()
 
-
-
-allStudentInvoices
-
 router.post('/', addStudent)
 router.get('/', allStudent)
 router.get('/student-invoices', allStudentInvoices)

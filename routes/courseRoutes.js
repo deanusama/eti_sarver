@@ -38,10 +38,10 @@ function checkFileType(file, cb) {
 
 
 
-router.post('/', upload.single('certificateDocs'), addCourse)
+router.post('/', upload.array('certificateDocs', 12), addCourse)
 router.get('/', allCourse)
 router.get('/:id', getUpdateCourse)
 router.post('/hide-courses', hideCourses)
-router.patch('/edit-course/:id', upload.single('certificateDocs'), editCourse)
+router.patch('/edit-course/:id', upload.array('certificateDocs', 12), editCourse)
 
 export default router

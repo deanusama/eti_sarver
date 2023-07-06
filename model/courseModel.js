@@ -20,10 +20,9 @@ const courseSchema = new Schema({
     certificate: String,
     sponser: String,
 
-    certificateDocs: {
-        name: { type: String },
-        uri: { type: String }
-    },
+    certificateDocs: [{
+            name: String
+        }],
 
     hideCourse: {
         type: Boolean,

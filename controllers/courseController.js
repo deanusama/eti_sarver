@@ -5,22 +5,15 @@ import Course from "../model/courseModel.js";
 
 export const addCourse = async (req, res) => {
 
-    const pdfDoc = req.file?.path // this is my pdf file
-    // console.log(req.body);
+    const { files, body } = req
+    const certificateDocs = files.map((file) => ({ name: file.path }))
 
     try {
 
-        // res.header('Content-Disposition', 'inline');
-
         const course = await Course.create({
-            ...req.body,
-
-            certificateDocs: {
-                name: req.file?.originalname,
-                uri: pdfDoc
-
-            }
+            ...body, certificateDocs
         });
+
         res.status(StatusCodes.CREATED).json({ course })
 
 
@@ -87,7 +80,6 @@ export const getUpdateCourse = async (req, res) => {
 
 export const editCourse = async (req, res) => {
 
-    const paramsId = req.params.id
     const pdfDoc = req.file?.path // this is my pdf file
 
     const { certificateDocs: notInUse, id, ...rest } = req.body
