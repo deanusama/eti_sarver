@@ -18,6 +18,7 @@ export const addCourse = async (req, res) => {
 
 
     } catch (error) {
+        console.log(error);
         res.status(StatusCodes.BAD_REQUEST).json({ msg: error.message })
 
     }
@@ -80,56 +81,44 @@ export const getUpdateCourse = async (req, res) => {
 
 export const editCourse = async (req, res) => {
 
-    const pdfDoc = req.file?.path // this is my pdf file
+    const { files, body } = req
+    const certificateDocs = files.map((file) => ({ name: file.path }))
 
-    const { certificateDocs: notInUse, id, ...rest } = req.body
+    const { certificateDocs: _, id, ...rest } = body
+
 
     try {
         const course = await Course.findOne({ _id: id })
-
-        //     // look it after this task
-        //     // createdBy: req.user.userId
 
         if (!course) {
             throw new Error(`No course with with ID ${id}`)
         }
 
-        if (pdfDoc) {
+        if (certificateDocs.length === 0) {
+
+            const previousFile = await Course.findById(id)
+            const { certificateDocs } = previousFile
 
             const updatedCourse = await Course.findOneAndUpdate(
                 { _id: id },
                 {
                     ...rest,
-
-                    certificateDocs: {
-                        name: req.file?.originalname,
-                        uri: pdfDoc
-
-                    }
+                    certificateDocs
                 },
                 { new: true, runValidators: true })
-            res.status(StatusCodes.OK).json({ updatedCourse })
 
+            res.status(StatusCodes.OK).json({ updatedCourse })
 
         } else {
 
-            const previousFile = await Course.findById(id)
-
             const updatedCourse = await Course.findOneAndUpdate(
                 { _id: id },
                 {
                     ...rest,
-
-                    certificateDocs: {
-                        name: previousFile.certificateDocs.name,
-                        uri: previousFile.certificateDocs.uri
-
-                    }
+                    certificateDocs
                 },
                 { new: true, runValidators: true })
-
             res.status(StatusCodes.OK).json({ updatedCourse })
-
 
         }
 

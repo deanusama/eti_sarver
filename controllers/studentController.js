@@ -93,25 +93,20 @@ export const getUpdateStudent = async (req, res) => {
 
 export const editStudent = async (req, res) => {
 
-    console.log(req.body);
-
-    const { studentNo, studentNameA, studentNameE, iDNo, gender, mobile, email, sponser, fees } = req.body
+    const { hideStudent, courseId, createdAt, updatedAt, __v, id: _, _id, ...rest } = req.body
 
     const id = req.params.id
 
-    // console.log(req.body);
     try {
         const student = await Student.findOne({ _id: id })
 
-        // look it after this task
-        // createdBy: req.user.userId
 
         if (!student) {
             throw new Error(`No course with with ID ${id}`)
         }
 
         const updatedStudent = await Student.findOneAndUpdate({ _id: id }
-            , { $set: { studentNo, studentNameA, studentNameE, iDNo, gender, mobile, email, sponser, fees } },
+            , { $set: { ...rest } },
             { new: true, runValidators: true })
         res.status(StatusCodes.OK).json({ updatedStudent })
 
