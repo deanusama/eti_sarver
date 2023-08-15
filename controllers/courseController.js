@@ -6,7 +6,8 @@ import Course from "../model/courseModel.js";
 export const addCourse = async (req, res) => {
 
     const { files, body } = req
-    const certificateDocs = files.map((file) => ({ name: file.path }))
+    const certificateDocs = files.map((file) => ({ name: file.originalname, documentURL: file.path }))
+
 
     try {
 
@@ -82,10 +83,12 @@ export const getUpdateCourse = async (req, res) => {
 export const editCourse = async (req, res) => {
 
     const { files, body } = req
-    const certificateDocs = files.map((file) => ({ name: file.path }))
+    const newCertificateDocs = files.map((file) => ({ name: file.originalname, documentURL: file.path }))
 
-    const { certificateDocs: _, id, ...rest } = body
+    const { certificateDocs: _, id, previousCertificateDocs: rawPreviousCertificateDocs, ...rest } = body
+    const previousCertificateDocs = JSON.parse(rawPreviousCertificateDocs)
 
+    const certificateDocs = [...newCertificateDocs, ...previousCertificateDocs]
 
     try {
         const course = await Course.findOne({ _id: id })
@@ -94,33 +97,15 @@ export const editCourse = async (req, res) => {
             throw new Error(`No course with with ID ${id}`)
         }
 
-        if (certificateDocs.length === 0) {
+        const updatedCourse = await Course.findOneAndUpdate(
+            { _id: id },
+            {
+                ...rest,
+                certificateDocs
+            },
+            { new: true, runValidators: true })
+        res.status(StatusCodes.OK).json({ updatedCourse })
 
-            const previousFile = await Course.findById(id)
-            const { certificateDocs } = previousFile
-
-            const updatedCourse = await Course.findOneAndUpdate(
-                { _id: id },
-                {
-                    ...rest,
-                    certificateDocs
-                },
-                { new: true, runValidators: true })
-
-            res.status(StatusCodes.OK).json({ updatedCourse })
-
-        } else {
-
-            const updatedCourse = await Course.findOneAndUpdate(
-                { _id: id },
-                {
-                    ...rest,
-                    certificateDocs
-                },
-                { new: true, runValidators: true })
-            res.status(StatusCodes.OK).json({ updatedCourse })
-
-        }
 
     } catch (error) {
 

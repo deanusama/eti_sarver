@@ -6,7 +6,7 @@ import CipsStudent from "../model/cipsStudentModel.js";
 export const addCipsStudent = async (req, res) => {
 
     const { files, body: { examDetail: examDetailRaw, ...rest } } = req
-    const cipsDocs = files.map((file) => ({ name: file.path }))
+    const cipsDocs = files.map((file) => ({ name: file.originalname, documentURL: file.path }))
 
     const examDetail = JSON.parse(examDetailRaw)
 
@@ -86,55 +86,35 @@ export const getUpdateCipsStudent = async (req, res) => {
 export const editCipsStudent = async (req, res) => {
 
     const id = req.params.id
-    const { files, body: { examDetail: examDetailRaw, ...rest } } = req
-    const cipsDocs = files.map((file) => ({ name: file.path }))
+    const { files, body: { examDetail: examDetailRaw, previousCipsDocs: rawPreviousCipsDocs, ...rest } } = req
+    const previousCipsDocs = JSON.parse(rawPreviousCipsDocs)
+    const newCipsDocs = files.map((file) => ({ name: file.originalname, documentURL: file.path }))
 
     const examDetail = JSON.parse(examDetailRaw)
+
+    const cipsDocs = [...previousCipsDocs, ...newCipsDocs]
 
     try {
 
         const cipsStudent = await CipsStudent.findOne({ _id: id })
 
-        // look it after this task
-        // createdBy: req.user.userId
-
         if (!cipsStudent) {
             throw new Error(`No Cips Student with with ID ${id}`)
         }
 
-        let updatedCipsStudent;
+        const updatedCipsStudent = await CipsStudent.findOneAndUpdate(
+            { _id: id },
 
-        if (files.length === 0) {
+            {
+                ...rest, examDetail, cipsDocs
+            },
 
-            const { cipsDocs } = await CipsStudent.findById(id)
-            const files = cipsDocs.map((item) => ({ name: item.name }))
+            { new: true, runValidators: true })
 
-            updatedCipsStudent = await CipsStudent.findOneAndUpdate(
-                { _id: id },
-                {
-                    ...rest, examDetail, cipsDocs: files
-                },
-
-                { new: true, runValidators: true }
-
-            )
-
-        } else {
-
-            updatedCipsStudent = await CipsStudent.findOneAndUpdate(
-                { _id: id },
-
-                {
-                    ...rest, examDetail, cipsDocs
-                },
-
-                { new: true, runValidators: true })
-
-        }
 
         res.status(StatusCodes.OK).json({ updatedCipsStudent })
+
     } catch (error) {
         res.status(StatusCodes.BAD_REQUEST).json({ msg: error.message })
-
     }
 }

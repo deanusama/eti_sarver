@@ -21,7 +21,8 @@ const courseSchema = new Schema({
     sponser: String,
 
     certificateDocs: [{
-            name: String
+            name: String,
+            documentURL: String
         }],
 
     hideCourse: {

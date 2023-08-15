@@ -1,5 +1,5 @@
 import express from "express"
-import { addCipsStudent, allCipsStudent, editCipsStudent, getUpdateCipsStudent, hideCipsStudent } from "../controllers/cipsStudentController.js"
+import { addCipsStudent, allCipsStudent, editCipsStudent, getUpdateCipsStudent, hideCipsStudent }from "../controllers/cipsStudentController.js"
 import path from 'path'
 import multer from "multer";
 
@@ -10,7 +10,7 @@ const router = express.Router()
 const storage = multer.diskStorage({
     destination: './uploads/cips',
     filename: function (req, file, cb) {
-        cb(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname));
+        cb(null, file.fieldname + '-' + Math.random().toString(36).slice(2, 8) + path.extname(file.originalname));
     }
 });
 // Init Upload

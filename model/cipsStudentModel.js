@@ -24,7 +24,8 @@ const cipsStudentSchema = new Schema({
         default: false
     },
     cipsDocs: [{
-        name: String
+        name: String,
+        documentURL: String
     }],
 
     examDetail: [{
