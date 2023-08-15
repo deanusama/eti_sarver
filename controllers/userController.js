@@ -32,6 +32,7 @@ export const loginUser = async (req, res) => {
     try {
 
         const user = await User.findOne({ email })
+        
         if (!user) {
             throw new Error("Incorrect email or password")
         }
