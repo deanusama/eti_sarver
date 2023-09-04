@@ -25,7 +25,7 @@ const courseSchema = new Schema({
             documentURL: String
         }],
 
-    hideCourse: {
+    hide: {
         type: Boolean,
         default: false
     }

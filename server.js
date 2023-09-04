@@ -18,6 +18,7 @@ app.use(cors({
     origin: pathURL
 }))
 
+console.log('server');
 app.use("/uploads", express.static('uploads'))
 
 //Routes

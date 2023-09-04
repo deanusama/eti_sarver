@@ -1,5 +1,5 @@
 import express from "express"
-import { addStudent, allStudent, allStudentInvoices, editStudent, editStudentInvoice, getUpdateStudent, hideStudents } from "../controllers/studentController.js";
+import { addStudent, allStudent, allStudentInvoices, certificateDownload, editStudent, editStudentInvoice, getUpdateStudent, hideStudents, invoiceDownload } from "../controllers/studentController.js";
 
 const router = express.Router()
 
@@ -12,5 +12,9 @@ router.get('/:id', getUpdateStudent)
 router.post('/hide-students', hideStudents)
 // router.post('/bulk-delete', deleteCourse)
 router.patch('/edit-student/:id', editStudent)
+
+
+router.post('/invoice', invoiceDownload)
+router.post('/certificate', certificateDownload)
 
 export default router

@@ -1,6 +1,6 @@
 import express from "express"
 import path from 'path'
-import { addCourse, allCourse, editCourse, getUpdateCourse, hideCourses } from "../controllers/courseController.js"
+import { addCourse, allCourse, editCourse, getUpdateCourse, hideCourses, invoiceDownload } from "../controllers/courseController.js"
 import multer from "multer";
 
 const router = express.Router()
@@ -43,5 +43,10 @@ router.get('/', allCourse)
 router.get('/:id', getUpdateCourse)
 router.post('/hide-courses', hideCourses)
 router.patch('/edit-course/:id', upload.array('certificateDocs', 12), editCourse)
+// router.get('/invoice', getContractualInvoiceDocx)
+
+router.post('/invoice', invoiceDownload)
+
 
 export default router
+

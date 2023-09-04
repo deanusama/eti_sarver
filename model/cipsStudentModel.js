@@ -8,8 +8,6 @@ const cipsStudentSchema = new Schema({
     membership: String,
     email: String,
     password: String,
-    dateOfJoin: String,
-    expiryDate: String,
     courseTitle: String,
     idNo: String,
     gender: String,
@@ -19,7 +17,7 @@ const cipsStudentSchema = new Schema({
     group: String,
     fees: String,
 
-    hideCipsStudent: {
+    hide: {
         type: Boolean,
         default: false
     },
@@ -37,8 +35,6 @@ const cipsStudentSchema = new Schema({
         remarks: String,
 
     }]
-
-
 })
 
 

@@ -16,7 +16,7 @@ const studentSchema = new Schema({
     sponser: String,
     fees: String,
 
-    hideStudent: {
+    hide: {
         type: Boolean,
         default: false 
     },
