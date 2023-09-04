@@ -18,7 +18,6 @@ app.use(cors({
     origin: pathURL
 }))
 
-console.log('server');
 app.use("/uploads", express.static('uploads'))
 
 //Routes
@@ -26,6 +25,10 @@ app.use('/api/v1/user', userRouter)
 app.use('/api/v1/course', courseRouter)
 app.use('/api/v1/student', studentRouter)
 app.use('/api/v1/cips', cipsStudentRouter)
+
+app.get("/", (req, res) => {
+    res.json({ msg: "Home page" })
+})
 
 
 const port = process.env.PORT || 5000
