@@ -1,35 +1,52 @@
 import { StatusCodes } from "http-status-codes";
 import CipsStudent from "../model/cipsStudentModel.js";
 
-
-
 import fsPromise from 'fs/promises';
-// import { fileURLToPath } from 'url';
-import path, { dirname } from 'path';
-// import JSZip from 'jszip';
+import path from 'path';
 import Docxtemplater from 'docxtemplater';
 import Pizzip from 'pizzip';
+import { upload } from "../routes/cipsStudentRoutes.js";
 
 
 
 export const addCipsStudent = async (req, res) => {
 
-    const { files, body: { examDetail: examDetailRaw, ...rest } } = req
+    upload.array('cipsDocs', 12)(req, res, async (err) => {
 
-    try {
-        const cipsDocs = files.map((file) => ({ name: file.originalname, documentURL: file.path }))
-        const examDetail = JSON.parse(examDetailRaw)
+        if (err) {
+            console.log(err);
+            const { name, code, message: msg } = err
 
-        const cipsStudent = await CipsStudent.create({
-            ...rest, cipsDocs, examDetail
-        });
+            if (name === 'MulterError' && code === "LIMIT_FILE_SIZE") {
+                // Multer error like file too large
+                return res.status(400).json({ msg: "File is too large max size is 1MB" });
+            }
 
-        res.status(StatusCodes.CREATED).json({ cipsStudent })
+            if (name === 'Error') {
 
-    } catch (error) {
-        res.status(StatusCodes.BAD_REQUEST).json({ error: "Failed to add student", msg: error.message })
+                return res.status(400).json({ msg });
+            }
+        }
 
-    }
+        const { files, body: { examDetail: examDetailRaw, ...rest } } = req
+
+        try {
+            const cipsDocs = files.map((file) => ({ name: file.originalname, documentURL: file.path }))
+            const examDetail = JSON.parse(examDetailRaw)
+
+            const cipsStudent = await CipsStudent.create({
+                ...rest, cipsDocs, examDetail
+            });
+
+            res.status(StatusCodes.CREATED).json({ cipsStudent })
+
+        } catch (error) {
+            res.status(StatusCodes.BAD_REQUEST).json({ error: "Failed to add student", msg: error.message })
+
+        }
+
+    })
+
 }
 
 export const allCipsStudent = async (req, res) => {
@@ -88,37 +105,58 @@ export const getUpdateCipsStudent = async (req, res) => {
 
 export const editCipsStudent = async (req, res) => {
 
-    const id = req.params.id
-    const { files, body: { examDetail: examDetailRaw, previousCipsDocs: rawPreviousCipsDocs, cipsDocs: _, ...rest } } = req
 
-    try {
-        const previousCipsDocs = JSON.parse(rawPreviousCipsDocs)
-        const newCipsDocs = files.map((file) => ({ name: file.originalname, documentURL: file.path }))
+    upload.array('cipsDocs', 12)(req, res, async (err) => {
 
+        if (err) {
+            console.log(err);
+            const { name, code, message: msg } = err
 
-        const examDetail = JSON.parse(examDetailRaw)
-        const cipsDocs = [...previousCipsDocs, ...newCipsDocs]
+            if (name === 'MulterError' && code === "LIMIT_FILE_SIZE") {
+                // Multer error like file too large
+                return res.status(400).json({ msg: "File is too large max size is 1MB" });
+            }
 
+            if (name === 'Error') {
 
-        const cipsStudent = await CipsStudent.findOne({ _id: id })
-        if (!cipsStudent) {
-            throw new Error(`No Cips Student with with ID ${id}`)
+                return res.status(400).json({ msg });
+            }
         }
 
-        const updatedCipsStudent = await CipsStudent.findOneAndUpdate(
-            { _id: id },
 
-            { ...rest, examDetail, cipsDocs },
-            { new: true, runValidators: true })
+        const id = req.params.id
+        const { files, body: { examDetail: examDetailRaw, previousCipsDocs: rawPreviousCipsDocs, cipsDocs: _, ...rest } } = req
+    
+        try {
+            const previousCipsDocs = JSON.parse(rawPreviousCipsDocs)
+            const newCipsDocs = files.map((file) => ({ name: file.originalname, documentURL: file.path }))
+    
+    
+            const examDetail = JSON.parse(examDetailRaw)
+            const cipsDocs = [...previousCipsDocs, ...newCipsDocs]
+    
+    
+            const cipsStudent = await CipsStudent.findOne({ _id: id })
+            if (!cipsStudent) {
+                throw new Error(`No Cips Student with with ID ${id}`)
+            }
+    
+            const updatedCipsStudent = await CipsStudent.findOneAndUpdate(
+                { _id: id },
+    
+                { ...rest, examDetail, cipsDocs },
+                { new: true, runValidators: true })
+    
+    
+            res.status(StatusCodes.OK).json({ updatedCipsStudent })
+    
+        } catch (error) {
+            res.status(StatusCodes.BAD_REQUEST).json({ error: 'Failed to update Cips Student', message: error.message })
+        }
 
+    })
 
-        res.status(StatusCodes.OK).json({ updatedCipsStudent })
-
-    } catch (error) {
-        res.status(StatusCodes.BAD_REQUEST).json({ error: 'Failed to update Cips Student', message: error.message })
-    }
 }
-
 
 
 

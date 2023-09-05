@@ -14,36 +14,25 @@ const storage = multer.diskStorage({
   }
 });
 // Init Upload
-const upload = multer({
+export const upload = multer({
   storage: storage,
   limits: { fileSize: 1000000 },
   fileFilter: function (req, file, cb) {
-    checkFileType(file, cb);
+    if (file.mimetype == "image/png" || file.mimetype == "image/jpg" || file.mimetype == "image/jpeg" || file.mimetype == "application/pdf" || file.mimetype == "application/vnd.openxmlformats-officedocument.wordprocessingml.document") {
+      cb(null, true);
+    } else {
+      cb(null, false);
+      return cb(new Error('Only .png, .jpg .jpeg .pdf and .docx format allowed!'));
+    }
   }
 })
-function checkFileType(file, cb) {
-  // Allowed ext
-  const filetypes = /pdf/;
-  // Check ext
-  const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
-  // Check mime
-  const mimetype = filetypes.test(file.mimetype);
-
-  if (mimetype && extname) {
-    return cb(null, true);
-  } else {
-    cb('PDF files only!');
-  }
-}
 
 
-
-router.post('/', upload.array('certificateDocs', 12), addCourse)
+router.post('/', addCourse)
 router.get('/', allCourse)
 router.get('/:id', getUpdateCourse)
 router.post('/hide-courses', hideCourses)
-router.patch('/edit-course/:id', upload.array('certificateDocs', 12), editCourse)
-// router.get('/invoice', getContractualInvoiceDocx)
+router.patch('/edit-course/:id', editCourse)
 
 router.post('/invoice', invoiceDownload)
 
